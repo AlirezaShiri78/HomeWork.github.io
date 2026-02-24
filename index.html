@@ -1,0 +1,1034 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>برگه ی تکالیف دانش آموزان</title>
+  <style>
+    /* =====================
+       فونت ایران‌سنس (اختیاری)
+       برای آفلاین: فایل‌های IRANSansWeb.woff2 و IRANSansWeb.woff را کنار این HTML بگذارید
+       ===================== */
+    @font-face{
+      font-family:"IRANSans";
+      src:
+        url("IRANSansWeb.woff2") format("woff2"),
+        url("IRANSansWeb.woff") format("woff");
+      font-weight:100 900;
+      font-style:normal;
+      font-display:swap;
+    }
+
+    :root{
+      --blue:#1d4ed8;
+      --blue2:#2563eb;
+      --bg:#f6f9ff;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#dbeafe;
+      --shadow: 0 12px 30px rgba(2, 6, 23, .08);
+      --radius: 18px;
+
+      --cols: 2;
+      --rows: 5;
+      --sheetFont: 11px;
+    }
+
+    *{box-sizing:border-box}
+    button, input, select, textarea{font-family: inherit;}
+
+    body{
+      margin:0;
+      font-family: IRANSans, "Vazirmatn", "Tahoma", system-ui, -apple-system, Segoe UI, Arial;
+      background: linear-gradient(180deg, #eff6ff, #ffffff 50%, #eff6ff);
+      color:var(--text);
+    }
+
+    header{
+      position: sticky;
+      top:0;
+      z-index:20;
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,.78);
+      border-bottom:1px solid var(--border);
+    }
+    .header-inner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 18px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .brand{display:flex;flex-direction:column;gap:2px;line-height:1.2}
+    .brand b{font-size:14px}
+    .brand span{font-size:12px;color:var(--muted)}
+
+    .top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+
+    .btn{
+      border:1px solid transparent;
+      background: var(--blue);
+      color:#fff;
+      padding:10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:12px;
+      transition: transform .05s ease, filter .15s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{filter:brightness(1.03)}
+    .btn:active{transform: translateY(1px)}
+    .btn.secondary{
+      background:#fff;
+      color:var(--blue);
+      border-color: var(--border);
+    }
+    .btn.danger{background:#ef4444}
+
+    .pill{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      background:#fff;
+      box-shadow: 0 8px 22px rgba(2,6,23,.06);
+    }
+    .pill b{font-size:12px}
+    .pill span{font-size:12px;color:var(--muted);font-weight:800}
+
+    main{max-width: 1400px;margin: 0 auto;padding: 16px;}
+
+    /* ====== Cards grid ====== */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+      align-items:start;
+    }
+
+    .group-card{
+      grid-column: span 6;
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .group-head{
+      padding: 12px 12px 10px;
+      border-bottom:1px solid rgba(255,255,255,.18);
+      background: linear-gradient(180deg, #1d4ed8, #1e40af);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .group-head b{font-size:13px;color:#fff}
+    .group-head small{display:block;margin-top:2px;color: rgba(255,255,255,.82);font-weight:800;font-size:12px}
+    .group-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+
+    .group-head .btn.secondary{
+      background: rgba(255,255,255,.14);
+      color:#fff;
+      border-color: rgba(255,255,255,.22);
+    }
+    .group-head .btn.danger{
+      background: rgba(239,68,68,.95);
+    }
+
+    .group-body{padding: 12px;display:grid;grid-template-columns: 1fr;gap:12px;align-items:stretch;}
+    @media (max-width: 900px){
+      .group-body{grid-template-columns: 1fr;}
+    }
+
+    /* ====== Mini sheet preview (canvas-like) ====== */
+    .preview-wrap{
+      border:1px solid var(--border);
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow: 0 10px 24px rgba(2,6,23,.06);
+      overflow:hidden;
+      height: 100%;
+      display:flex;
+      flex-direction:column;
+    }
+    .preview-label{
+      padding:10px 10px;
+      border-bottom:1px solid var(--border);
+      background: linear-gradient(180deg, #ffffff, #f8fbff);
+      display:flex;justify-content:space-between;align-items:center;gap:10px;
+      font-weight:900;font-size:12px;color:var(--text);
+    }
+    .preview-label span{color:var(--muted);font-weight:800}
+    .preview-canvas{
+      padding:10px;
+      background: var(--bg);
+      flex:1;
+      display:flex;
+    }
+    .mini-sheet{
+      width:100%;
+      height: 200px; /* کنواس کوچک، جمع‌وجور */
+      background:#fff;
+      border:1px solid rgba(2,6,23,.12);
+      border-radius: 14px;
+      overflow:hidden;
+      position:relative;
+      flex:1;
+    }
+    .mini-sheet-inner{
+      position:absolute;
+      inset:0;
+      transform-origin: top right;
+      /* scale will be set by JS */
+    }
+
+    /* ====== Sheet styles (same for print + preview) ====== */
+    .sheet-grid{
+      width:100%;
+      height:100%;
+      display:grid;
+      grid-template-columns: repeat(var(--cols), 1fr);
+      grid-template-rows: repeat(var(--rows), 1fr);
+    }
+
+    .sheet{
+      border:1px dashed rgba(37,99,235,.35);
+      padding: 4mm 4mm;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      gap: 3mm;
+    }
+
+    .sheet .title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      border:1px solid rgba(37,99,235,.20);
+      background: rgba(37,99,235,.06);
+      border-radius: 12px;
+      padding: 6px 10px;
+      font-weight:900;
+      font-size: calc(var(--sheetFont) + 1px);
+      line-height:1.3;
+    }
+    .sheet .meta{
+      font-size: 11px;
+      color: var(--muted);
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .tasks{
+      margin:0;
+      padding:0 18px 0 0;
+      list-style: none;
+      display:flex;
+      flex-direction:column;
+      gap: 4px;
+      font-size: var(--sheetFont);
+      line-height: 1.35;
+      font-weight:700;
+    }
+    .tasks li{
+      position:relative;
+      padding-right: 14px;
+      word-break: break-word;
+    }
+    .tasks li::before{
+      content:"•";
+      position:absolute;
+      right:0;
+      top:0;
+      color: var(--blue2);
+      font-weight:900;
+    }
+
+    .hint{
+      font-size:12px;
+      color: var(--muted);
+      line-height:1.6;
+      margin: 6px 0 0;
+      font-weight:800;
+    }
+
+    .tasks-pane{min-height: 200px; display:flex; flex-direction:column;}
+.tasks-pane .task-list{flex:1; overflow:auto; padding-left:2px; padding-right:2px;}
+.tasks-pane .task-list::-webkit-scrollbar{width:10px}
+.tasks-pane .task-list::-webkit-scrollbar-thumb{background: rgba(37,99,235,.18); border-radius:999px}
+.tasks-pane .task-list::-webkit-scrollbar-track{background: rgba(2,6,23,.04); border-radius:999px}
+
+.task-input{
+      display:flex;
+      gap:8px;
+      align-items:stretch;
+      margin-bottom: 10px;
+    }
+    .task-input input{
+      flex:1;
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid var(--border);
+      outline:none;
+      font-family: inherit;
+      font-size:12px;
+      background:#fff;
+    }
+
+    .task-list{
+      margin:0;
+      padding:0;
+      list-style:none;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .task-item{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      padding: 10px 10px;
+      border:1px solid var(--border);
+      border-radius: 14px;
+      background:#fff;
+    }
+    .task-item span{
+      font-size:12px;
+      font-weight:800;
+      line-height:1.55;
+      word-break: break-word;
+    }
+    .task-item button{
+      border:none;
+      background: rgba(239,68,68,.12);
+      color:#b91c1c;
+      font-weight:900;
+      border-radius: 12px;
+      padding: 7px 10px;
+      cursor:pointer;
+      font-family: inherit;
+      white-space:nowrap;
+    }
+
+    .empty{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: var(--shadow);
+      font-weight:900;
+      color: var(--muted);
+      grid-column: span 12;
+    }
+
+    /* ====== Modals ====== */
+    .overlay{
+      position: fixed;
+      inset:0;
+      background: rgba(2,6,23,.45);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:50;
+      padding: 16px;
+    }
+    .overlay.show{display:flex}
+
+    .modal{
+      width:min(560px, 100%);
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: 0 30px 80px rgba(2,6,23,.22);
+      overflow:hidden;
+    }
+    .modal-head{
+      padding: 12px 14px;
+      border-bottom:1px solid var(--border);
+      background: linear-gradient(180deg, #eff6ff, #ffffff);
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+    }
+    .modal-head b{font-size:13px}
+    .modal-body{padding: 14px}
+    .modal-actions{padding: 12px 14px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      margin-bottom: 10px;
+    }
+    .field label{font-size:12px;color:var(--muted);font-weight:900}
+    .field input{
+      width:100%;
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid var(--border);
+      outline:none;
+      font-family: inherit;
+      font-size:12px;
+      background:#fff;
+    }
+    .row2{display:grid;grid-template-columns: 1fr 1fr;gap:10px}
+    @media (max-width:520px){.row2{grid-template-columns:1fr}}
+
+
+    .modal.wide{
+      width:min(900px, 100%);
+    }
+    .preview-popup{
+      background: var(--bg);
+      border:1px solid var(--border);
+      border-radius: 18px;
+      padding: 12px;
+      height: min(74vh, 720px);
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      overflow:auto;
+    }
+    .preview-popup .sheet{
+      width: min(92vw, 920px);
+      max-width: 920px;
+      background:#fff;
+      border: 1px solid rgba(37,99,235,.18);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 14px 32px rgba(2,6,23,.10);
+    }
+    .preview-popup .sheet{ transform-origin: top right; }
+/* =====================
+       PRINT / PDF
+       ===================== */
+    @page { size: A4; margin: 0; }
+    .print-area{ display:none; }
+
+    @media print{
+      body{ background:#fff; }
+      header, main, .overlay{ display:none !important; }
+      .print-area{ display:block; }
+      .print-page{
+        width: 210mm;
+        height: 297mm;
+        page-break-after: always;
+      }
+      .print-page:last-child{ page-break-after: auto; }
+      .print-page .sheet{ border: 1px dashed rgba(0,0,0,.25); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <b>برگه ی تکالیف دانش آموزان</b>
+        <span>طراحی و توسعه: علیرضا شیری</span>
+      </div>
+
+      <div class="top-actions">
+        <div class="pill" title="وضعیت فعلی خروجی">
+          <b id="capLabel">۱۰</b>
+          <span>ظرفیت هر صفحه</span>
+          <span style="opacity:.5">|</span>
+          <b id="totalSheets">۰</b>
+          <span>شیت‌ها</span>
+          <span style="opacity:.5">|</span>
+          <b id="totalPages">۰</b>
+          <span>صفحه A4</span>
+        </div>
+
+        <button class="btn secondary" id="btnSettings">تنظیمات خروجی</button>
+        <button class="btn secondary" id="btnAddGroup">ساخت گروه</button>
+
+        <button class="btn" id="btnPrint">پرینت</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid" id="groupsGrid"></div>
+  </main>
+
+  <!-- Settings Modal -->
+  <div class="overlay" id="settingsOverlay" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal-head">
+        <b>تنظیمات خروجی A4</b>
+        <button class="btn secondary" id="closeSettings">بستن</button>
+      </div>
+      <div class="modal-body">
+        <div class="row2">
+          <div class="field">
+            <label>تعداد ستون در هر صفحه A4</label>
+            <input id="cols" type="number" min="1" max="6" value="2" />
+          </div>
+          <div class="field">
+            <label>تعداد ردیف در هر صفحه A4</label>
+            <input id="rows" type="number" min="1" max="10" value="5" />
+          </div>
+        </div>
+        <p class="hint">ردیف و ستون، <b>حداکثر</b> تعداد شیت در هر صفحه A4 هستند. اگر تعداد دانش‌آموزان بیشتر شود، خودکار به صفحه بعد می‌رود.</p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="resetAll">ریست کامل</button>
+        <button class="btn" id="saveSettings">ذخیره</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Group Modal -->
+  <div class="overlay" id="groupOverlay" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal-head">
+        <b>ساخت گروه جدید</b>
+        <button class="btn secondary" id="closeGroup">بستن</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>نام گروه (مثلاً کلاس اول)</label>
+          <input id="newGroupName" type="text" placeholder="کلاس اول" />
+        </div>
+        <div class="field">
+          <label>تعداد دانش‌آموزان این گروه</label>
+          <input id="newGroupCount" type="number" min="1" value="10" />
+        </div>
+        <p class="hint">بعد از ساخت، می‌توانید تکلیف‌ها را وارد کنید. پیش‌نمایش یک شیت از همین گروه در کارت نمایش داده می‌شود.</p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="addGroup">افزودن گروه</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Preview Modal -->
+  <div class="overlay" id="previewOverlay" role="dialog" aria-modal="true">
+    <div class="modal wide">
+      <div class="modal-head">
+        <b id="previewTitle">پیش‌نمایش</b>
+        <button class="btn secondary" id="closePreview">بستن</button>
+      </div>
+      <div class="modal-body">
+        <div class="preview-popup" id="previewHost"></div>
+       
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Hidden Print Area -->
+  <div class="print-area" id="printArea"></div>
+
+  <script>
+    // =====================
+    // State
+    // =====================
+    const state = {
+      cols: 2,
+      rows: 5,
+      sheetFontPx: 11,
+            groups: [] // {id, name, count, tasks:[]}
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
+
+    // =====================
+    // Init / Persist
+    // =====================
+    function init(){
+      try{
+        const raw = localStorage.getItem('hw_a4_state_v2');
+        if(raw){
+          const saved = JSON.parse(raw);
+          Object.assign(state, saved);
+        }
+      }catch(e){}
+
+      // Apply to UI
+      $('cols').value = state.cols;
+      $('rows').value = state.rows;
+bind();
+      renderAll();
+    }
+
+    function persist(){
+      try{ localStorage.setItem('hw_a4_state_v2', JSON.stringify(state)); }catch(e){}
+    }
+
+    // =====================
+    // Modals
+    // =====================
+    function openModal(overlayId){
+      const ov = $(overlayId);
+      ov.classList.add('show');
+      // focus first input if exists
+      const inp = ov.querySelector('input');
+      if(inp) setTimeout(()=>inp.focus(), 50);
+    }
+    function closeModal(overlayId){
+      $(overlayId).classList.remove('show');
+    }
+    function bindOverlayClose(overlayId){
+      const ov = $(overlayId);
+      ov.addEventListener('click', (e) => {
+        if(e.target === ov) closeModal(overlayId);
+      });
+      window.addEventListener('keydown', (e) => {
+        if(e.key === 'Escape' && ov.classList.contains('show')) closeModal(overlayId);
+      });
+    }
+
+
+    // =====================
+    // Preview (Popup)
+    // =====================
+    function openPreview(g){
+      $('previewTitle').textContent = 'پیش‌نمایش: ' + g.name;
+      const host = $('previewHost');
+      host.innerHTML = '';
+
+      const sheet = renderSheet({ groupName: g.name, tasks: g.tasks.slice() });
+      // نمایش فقط یک شیت (بدون قاب A4)
+      sheet.style.borderStyle = 'dashed';
+      sheet.style.borderColor = 'rgba(37,99,235,.35)';
+host.appendChild(sheet);
+      openModal('previewOverlay');
+
+      requestAnimationFrame(() => {
+        fitSheet(sheet);
+        fitPreviewScale();
+      });
+    }
+
+    function fitPreviewScale(){
+      const host = $('previewHost');
+      const sheet = host.querySelector('.sheet');
+      if(!host || !sheet) return;
+
+      // If host is smaller than the sheet, scale down to fit (with padding)
+      const hw = host.clientWidth - 24;
+      const hh = host.clientHeight - 24;
+      const rect = sheet.getBoundingClientRect();
+      const w = rect.width || 1;
+      const h = rect.height || 1;
+      const scale = Math.min(1, Math.min(hw / w, hh / h));
+      sheet.style.transform = `scale(${scale})`;
+    }
+
+
+    // =====================
+    // Events
+    // =====================
+    function bind(){
+      // Header actions
+      $('btnSettings').addEventListener('click', () => openModal('settingsOverlay'));
+      $('closeSettings').addEventListener('click', () => closeModal('settingsOverlay'));
+      bindOverlayClose('settingsOverlay');
+
+      $('btnAddGroup').addEventListener('click', () => openModal('groupOverlay'));
+      $('closeGroup').addEventListener('click', () => closeModal('groupOverlay'));
+      bindOverlayClose('groupOverlay');
+
+      $('closePreview').addEventListener('click', () => closeModal('previewOverlay'));
+      bindOverlayClose('previewOverlay');
+      $('saveSettings').addEventListener('click', () => {
+        state.cols = clampInt($('cols').value, 1, 6);
+        state.rows = clampInt($('rows').value, 1, 10);
+        $('cols').value = state.cols;
+        $('rows').value = state.rows;
+        closeModal('settingsOverlay');
+        renderAll();
+      });
+
+      $('resetAll').addEventListener('click', () => {
+        if(!confirm('همه گروه‌ها و تکالیف پاک شوند؟')) return;
+        state.groups = [];
+        renderAll();
+        closeModal('settingsOverlay');
+      });
+
+      $('addGroup').addEventListener('click', addGroupFromModal);
+      $('newGroupName').addEventListener('keydown', (e) => {
+        if(e.key === 'Enter') addGroupFromModal();
+      });
+
+      $('btnPrint').addEventListener('click', () => {
+        renderPrintArea();
+        window.print();
+      });
+window.addEventListener('resize', () => {
+        clearTimeout(window.__hwResizeT);
+        window.__hwResizeT = setTimeout(() => {
+          refitAllMiniSheets();
+          if($('previewOverlay').classList.contains('show')) fitPreviewScale();
+        }, 120);
+      });
+    }
+
+    function addGroupFromModal(){
+      const name = ($('newGroupName').value || '').trim();
+      const count = clampInt($('newGroupCount').value, 1, 999);
+      if(!name){
+        $('newGroupName').focus();
+        shake($('newGroupName'));
+        return;
+      }
+      state.groups.push({ id: uid(), name, count, tasks: [] });
+      $('newGroupName').value = '';
+      $('newGroupCount').value = count;
+      closeModal('groupOverlay');
+      renderAll();
+    }
+
+    // =====================
+    // Render
+    // =====================
+    function renderAll(){
+      document.documentElement.style.setProperty('--cols', String(state.cols));
+      document.documentElement.style.setProperty('--rows', String(state.rows));
+      document.documentElement.style.setProperty('--sheetFont', state.sheetFontPx + 'px');
+
+      renderGroupsGrid();
+      updateKPIs();
+      persist();
+
+      requestAnimationFrame(() => refitAllMiniSheets());
+    }
+
+    function renderGroupsGrid(){
+      const root = $('groupsGrid');
+      root.innerHTML = '';
+
+      if(state.groups.length === 0){
+        const div = document.createElement('div');
+        div.className = 'empty';
+        div.textContent = 'هنوز گروهی ساخته نشده است. از دکمه «ساخت گروه» استفاده کنید.';
+        root.appendChild(div);
+        return;
+      }
+
+      for(const g of state.groups){
+        root.appendChild(renderGroupCard(g));
+      }
+
+      // delegate actions
+      root.onclick = (e) => {
+        const el = e.target.closest('[data-act]');
+        if(!el) return;
+        const act = el.getAttribute('data-act');
+        const id = el.getAttribute('data-id');
+
+        const g = state.groups.find(x => x.id === id);
+        if(!g) return;
+
+        if(act === 'preview'){
+          openPreview(g);
+          return;
+        }
+
+        if(act === 'delGroup'){
+          if(!confirm(`گروه «${g.name}» حذف شود؟`)) return;
+          state.groups = state.groups.filter(x => x.id !== id);
+          renderAll();
+          return;
+        }
+
+        if(act === 'editCount'){
+          const val = prompt('تعداد دانش‌آموزان این گروه:', String(g.count));
+          if(val === null) return;
+          g.count = clampInt(val, 1, 999);
+          renderAll();
+          return;
+        }
+
+        if(act === 'addTask'){
+          const input = root.querySelector(`[data-act="taskInput"][data-id="${id}"]`);
+          if(input) addTask(id, input.value);
+          return;
+        }
+
+        if(act === 'delTask'){
+          const idx = Number(el.getAttribute('data-idx'));
+          g.tasks.splice(idx, 1);
+          renderAll();
+          return;
+        }
+      };
+
+      root.onkeydown = (e) => {
+        const input = e.target.closest('[data-act="taskInput"]');
+        if(!input) return;
+        if(e.key === 'Enter'){
+          e.preventDefault();
+          addTask(input.getAttribute('data-id'), input.value);
+        }
+      };
+    }
+
+    function renderGroupCard(g){
+      const card = document.createElement('div');
+      card.className = 'group-card';
+
+      const head = document.createElement('div');
+      head.className = 'group-head';
+      head.innerHTML = `
+        <div>
+          <b>${escapeHtml(g.name)}</b>
+          <small>دانش‌آموز: ${toPersianDigits(g.count)} • تکالیف: ${toPersianDigits(g.tasks.length)}</small>
+        </div>
+        <div class="group-actions">
+          <button class="btn secondary" data-act="preview" data-id="${g.id}">پیش‌نمایش</button>
+          <button class="btn secondary" data-act="editCount" data-id="${g.id}">ویرایش تعداد</button>
+          <button class="btn danger" data-act="delGroup" data-id="${g.id}">حذف</button>
+        </div>
+      `;
+      card.appendChild(head);
+
+      const body = document.createElement('div');
+      body.className = 'group-body';
+
+      // Left: tasks editor (compact)
+      const left = document.createElement('div');
+      left.className = 'tasks-pane';
+
+      const inputWrap = document.createElement('div');
+      inputWrap.className = 'task-input';
+      inputWrap.innerHTML = `
+        <input type="text" placeholder="تکلیف را بنویسید و Enter بزنید..." data-act="taskInput" data-id="${g.id}">
+        <button class="btn" data-act="addTask" data-id="${g.id}">افزودن</button>
+      `;
+      left.appendChild(inputWrap);
+
+      const ul = document.createElement('ul');
+      ul.className = 'task-list';
+      for(let i=0;i<g.tasks.length;i++){
+        const li = document.createElement('li');
+        li.className = 'task-item';
+        li.innerHTML = `
+          <span>${toPersianDigits(escapeHtml(g.tasks[i]))}</span>
+          <button title="حذف" data-act="delTask" data-id="${g.id}" data-idx="${i}">حذف</button>
+        `;
+        ul.appendChild(li);
+      }
+      left.appendChild(ul);
+
+      const hint = document.createElement('p');
+      hint.className = 'hint';
+
+      left.appendChild(hint);
+
+      // add tasks pane into body
+      body.appendChild(left);
+
+      card.appendChild(body);
+
+      return card;
+    }
+
+    function addTask(groupId, text){
+      const t = (text || '').trim();
+      if(!t) return;
+      const g = state.groups.find(x => x.id === groupId);
+      if(!g) return;
+      g.tasks.push(t);
+      renderAll();
+
+      const input = $('groupsGrid').querySelector(`[data-act="taskInput"][data-id="${groupId}"]`);
+      if(input){ input.value = ''; input.focus(); }
+    }
+
+    function updateKPIs(){
+      const cap = state.cols * state.rows;
+      $('capLabel').textContent = toPersianDigits(cap);
+
+      let total = 0;
+      for(const g of state.groups) total += g.count;
+      $('totalSheets').textContent = toPersianDigits(total);
+
+      const pages = total === 0 ? 0 : Math.ceil(total / cap);
+      $('totalPages').textContent = toPersianDigits(pages);
+    }
+
+    // =====================
+    // Render sheet (single)
+    // =====================
+    function renderSheet(data){
+      const d = document.createElement('div');
+      d.className = 'sheet';
+      d.dataset.sheet = '1';
+
+      const title = document.createElement('div');
+      title.className = 'title';
+      const left = escapeHtml(data.groupName);
+      title.innerHTML = `<span>${left}</span><span class="meta"></span>`;
+      d.appendChild(title);
+
+      if((data.tasks || []).length === 0){
+        const p = document.createElement('p');
+        p.className = 'hint';
+        p.style.margin = '0';
+        p.style.fontWeight = '900';
+        p.style.color = '#b45309';
+        p.textContent = 'برای این گروه هنوز تکلیفی ثبت نشده است.';
+        d.appendChild(p);
+      } else {
+        const ul = document.createElement('ul');
+        ul.className = 'tasks';
+        for(const t of data.tasks){
+          const li = document.createElement('li');
+          li.textContent = toPersianDigits(t);
+          ul.appendChild(li);
+        }
+        d.appendChild(ul);
+      }
+
+      // خط‌چین برش همیشه روشن
+      d.style.borderStyle = 'dashed';
+      d.style.borderColor = 'rgba(37,99,235,.35)';
+      return d;
+    }
+
+    // =====================
+    // Fit text so it never overflows (mini previews)
+    // =====================
+    function refitAllMiniSheets(){
+      const sheets = document.querySelectorAll('.sheet[data-sheet="1"]');
+      sheets.forEach(fitSheet);
+    }
+
+    function fitSheet(sheetEl){
+      const tasks = sheetEl.querySelector('.tasks');
+      if(!tasks) return;
+
+      tasks.style.fontSize = state.sheetFontPx + 'px';
+
+      const maxLoops = 40;
+      let loops = 0;
+
+      while(sheetEl.scrollHeight > sheetEl.clientHeight && loops < maxLoops){
+        const cur = parseFloat(getComputedStyle(tasks).fontSize);
+        if(cur <= 8) break;
+        tasks.style.fontSize = (cur - 0.5) + 'px';
+        loops++;
+      }
+    }
+
+    // =====================
+    // Print Area generation
+    // =====================
+    function renderPrintArea(){
+      const root = $('printArea');
+      root.innerHTML = '';
+
+      const pages = buildPages();
+
+      for(const pg of pages){
+        const page = document.createElement('div');
+        page.className = 'print-page';
+
+        const grid = document.createElement('div');
+        grid.className = 'sheet-grid';
+
+        for(const sheetData of pg.sheets){
+          const s = renderSheet(sheetData);
+          grid.appendChild(s);
+        }
+
+        // Fill missing
+        const capacity = state.cols * state.rows;
+        const missing = capacity - pg.sheets.length;
+        for(let i=0;i<missing;i++){
+          const empty = document.createElement('div');
+          empty.className = 'sheet';
+          empty.style.opacity = '0.18';
+          empty.innerHTML = `<div class="title">—<span class="meta">خالی</span></div>`;
+          empty.style.borderStyle = 'dashed';
+          empty.style.borderColor = 'rgba(0,0,0,.25)';
+          grid.appendChild(empty);
+        }
+
+        page.appendChild(grid);
+        root.appendChild(page);
+      }
+
+      // Fit again for print
+      requestAnimationFrame(() => {
+        const sheets = root.querySelectorAll('.sheet[data-sheet="1"]');
+        sheets.forEach(fitSheet);
+      });
+    }
+
+    function buildPages(){
+      const capacity = state.cols * state.rows;
+      const sheets = [];
+
+      for(const g of state.groups){
+        for(let i=1;i<=g.count;i++){
+          sheets.push({ groupName: g.name, tasks: g.tasks.slice() });
+        }
+      }
+
+      const pages = [];
+      for(let i=0;i<sheets.length;i+=capacity){
+        pages.push({ sheets: sheets.slice(i, i+capacity) });
+      }
+
+      if(pages.length === 0 && state.groups.length > 0){
+        pages.push({ sheets: [] });
+      }
+
+      return pages;
+    }
+
+    // =====================
+    // Helpers
+    // =====================
+    function clampInt(v, min, max){
+      const n = parseInt(v, 10);
+      if(Number.isNaN(n)) return min;
+      return Math.max(min, Math.min(max, n));
+    }
+
+    function toPersianDigits(str){
+      return String(str).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function shake(el){
+      el.animate([
+        {transform:'translateX(0)'},
+        {transform:'translateX(-6px)'},
+        {transform:'translateX(6px)'},
+        {transform:'translateX(-4px)'},
+        {transform:'translateX(4px)'},
+        {transform:'translateX(0)'}
+      ], {duration: 280});
+    }
+
+    // Kick off
+    init();
+  </script>
+</body>
+</html>
