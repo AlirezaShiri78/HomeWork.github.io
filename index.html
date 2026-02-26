@@ -4,21 +4,21 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>برگه ی تکالیف دانش آموزان</title>
-  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/iran-sans-font@master/dist/font-face.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/iransans-fontface@0.1.1/css/iransans/iransans-fontface.css">
   <style>
     /* =====================
        فونت ایران‌سنس (اختیاری)
        برای آفلاین: فایل‌های IRANSansWeb.woff2 و IRANSansWeb.woff را کنار این HTML بگذارید
        ===================== */
-    @font-face{
-      font-family:"IRANSans";
-      src:
-        url("IRANSansWeb.woff2") format("woff2"),
-        url("IRANSansWeb.woff") format("woff");
-      font-weight:100 900;
-      font-style:normal;
-      font-display:swap;
-    }
+   @font-face{
+  font-family:"IRANSansLocal";
+  src:
+    url("IRANSansWeb.woff2") format("woff2"),
+    url("IRANSansWeb.woff") format("woff");
+  font-weight:100 900;
+  font-style:normal;
+  font-display:swap;
+}
 
     :root{
       --blue:#1d4ed8;
@@ -41,7 +41,7 @@
 
     body{
       margin:0;
-      font-family: "IRANSans", IRANSans, "Vazirmatn", "Tahoma", system-ui, -apple-system, Segoe UI, Arial;
+        font-family: IRANSansLocal, IRANSans, "Vazirmatn", "Tahoma", system-ui, -apple-system, Segoe UI, Arial;
       background: linear-gradient(180deg, #eff6ff, #ffffff 50%, #eff6ff);
       color:var(--text);
     }
